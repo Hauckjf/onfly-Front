@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc && vite build",
     "preview": "vite preview",
     "tailwind:init": "node --loader=esbuild-register ./node_modules/tailwindcss/cli.js init -p"
   },
@@ -14,15 +14,21 @@
     "axios": "^1.8.4",
     "pinia": "^3.0.1",
     "sweetalert2": "^11.17.2",
+    "toastify-js": "^1.12.0",
+    "universal-cookie": "^8.0.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/toastify-js": "^1.12.3",
     "@vitejs/plugin-vue": "^5.2.1",
     "autoprefixer": "^10.4.21",
     "esbuild-register": "^3.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.1",
-    "vite": "^6.2.0"
+    "typescript": "^5.8.3",
+    "vite": "^6.2.0",
+    "vue-tsc": "^2.2.8"
   }
 }

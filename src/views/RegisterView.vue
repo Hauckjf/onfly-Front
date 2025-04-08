@@ -1,7 +1,42 @@
+<script setup>
+import { ref } from 'vue'
+import { useAuthStore } from '../stores/auth.store'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const userData = ref({
+  name: '',
+  email: '',
+  password: '',
+  password_confirmation: ''
+})
+
+const errors = ref({})
+const loading = ref(false)
+
+async function handleRegister() {
+  loading.value = true
+  errors.value = {}
+  
+  try {
+    await authStore.register(userData.value)
+    router.push('/login') // Só redireciona após registro bem-sucedido
+  } catch (error) {
+    errors.value = error.errors || { general: 'Erro ao registrar' }
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
 <template>
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 px-6">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
-            <img class="mx-auto h-20 w-auto rounded-full" src="../assets/onfly_logo.jpg" alt="Workflow">
+            <a href="/" class="flex flex-col sm:flex-row items-center gap-1 sm:gap-4">
+                <img class="mx-auto h-20 w-auto rounded-full" src="../assets/onfly_logo.jpg" alt="Workflow">
+            </a>
             <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
                 Registrar sua conta
             </h2>
@@ -14,67 +49,63 @@
             </p>
         </div>
 
-
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
             <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                <form>
+                <form @submit.prevent="handleRegister">
+                    <div v-if="errors.general" class="mb-4 text-red-500 text-sm">
+                        {{ errors.general }}
+                    </div>
+                    
                     <div>
                         <label for="name" class="block text-sm font-medium leading-5 text-gray-700">Nome</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
-                            <input id="name" name="name" type="text" required=""
-                                value=""
-                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
-                            <div class="hidden absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
+                            <input id="name" v-model="userData.name" name="name" type="text" required
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                                :class="{ 'border-red-500': errors.name }">
+                            <div v-if="errors.name" class="text-red-500 text-xs mt-1">{{ errors.name[0] }}</div>
                         </div>
                     </div>
 
                     <div class="mt-4">
                         <label for="email" class="block text-sm font-medium leading-5 text-gray-700">Email</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
-                            <input id="email" name="email" placeholder="seuemail@exemplo.com" type="email" required=""
-                                value=""
-                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
-                            <div class="hidden absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
+                            <input id="email" v-model="userData.email" name="email" placeholder="seuemail@exemplo.com" type="email" required
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                                :class="{ 'border-red-500': errors.email }">
+                            <div v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email[0] }}</div>
                         </div>
                     </div>
 
                     <div class="mt-4">
                         <label for="password" class="block text-sm font-medium leading-5 text-gray-700">Senha</label>
                         <div class="mt-1 rounded-md shadow-sm">
-                            <input id="password" name="password" type="password" required=""
-                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
+                            <input id="password" v-model="userData.password" name="password" type="password" required
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                                :class="{ 'border-red-500': errors.password }">
+                            <div v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password[0] }}</div>
                         </div>
                     </div>
                     <div class="mt-4">
                         <label for="confirmPassword" class="block text-sm font-medium leading-5 text-gray-700">Confirmação da Senha</label>
                         <div class="mt-1 rounded-md shadow-sm">
-                            <input id="confirmPassword" name="confirmPassword" type="password" required=""
-                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
+                            <input id="confirmPassword" v-model="userData.password_confirmation" name="confirmPassword" type="password" required
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                                :class="{ 'border-red-500': errors.password_confirmation }">
+                            <div v-if="errors.password_confirmation" class="text-red-500 text-xs mt-1">{{ errors.password_confirmation[0] }}</div>
                         </div>
                     </div>
 
-                    <div class="mt-4">
+                    <div class="mt-6">
                         <span class="block w-full rounded-md shadow-sm">
-                            <button type="submit"
-                                class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
-                                Registrar
+                            <button type="submit" :disabled="loading"
+                                class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:border-blue-700 focus:shadow-outline-blue active:bg-blue-700 transition duration-150 ease-in-out"
+                                :class="{ 'opacity-50 cursor-not-allowed': loading }">
+                                <span v-if="!loading">Registrar</span>
+                                <span v-else>Processando...</span>
                             </button>
                         </span>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
@@ -82,6 +113,6 @@
 
 <script>
 export default {
-    name: 'AuthView'
+    name: 'RegisterView'
 }
 </script>
