@@ -22,7 +22,6 @@ async function handleRegister() {
   
   try {
     await authStore.register(userData.value)
-    router.push('/login') // Só redireciona após registro bem-sucedido
   } catch (error) {
     errors.value = error.errors || { general: 'Erro ao registrar' }
   } finally {

@@ -32,7 +32,7 @@ api.interceptors.response.use(
     const loadingStore = useLoadingStore()
     loadingStore.stopLoading()
 
-    if (error.response?.status === 401) {
+    if (error.response?.status === 404) {
       const authStore = useAuthStore()
       authStore.logout()
       window.location.href = '/login'

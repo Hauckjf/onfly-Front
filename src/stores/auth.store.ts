@@ -11,7 +11,7 @@ const cookies = new Cookies();
 function showToast(message: string, type: 'success' | 'error' = 'success') {
   Toastify({
     text: message,
-    duration: 3000,
+    duration: type === 'success' ? 3000 : 6000,
     gravity: 'top',
     position: 'right',
     backgroundColor: type === 'success' ? '#4caf50' : '#f44336',
@@ -39,22 +39,21 @@ export const useAuthStore = defineStore('auth', {
                 router.push('/dashboard')
               }
             } catch (error: any) {
-              if (error.response) {
-                throw error.response.data
-              }
-              throw new Error('Network error')
+              showToast('Email e/ou Senha Invalidos!', 'error')
             }
           },
         async register(userData: any) {
             try {
                 const response = await api.post('/auth/register', userData)
                 showToast('Usuario criado com sucesso!')
-                this.token = response.data.token
-                this.user = response.data.user
-                
                 router.push('/login') 
             } catch (error: any) {
-                console.log(error.response.data)
+                console.log(error.response.data.errors)
+                if(error.response.data.errors.password.length > 0){
+                    error.response.data.errors.password.forEach((element : any) => {
+                      showToast(element, 'error')
+                    });  
+                }
             }
         },
         async logout() {
